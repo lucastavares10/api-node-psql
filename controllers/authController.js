@@ -2,6 +2,7 @@ const express = require('express');
 const yup = require('yup');
 const Usuario = require('../model/Usuario');
 const sequelize = require('../database/db');
+const asyncHandler = require('express-async-handler');
 
 const router = express.Router();
 
@@ -11,7 +12,7 @@ const schema = yup.object().shape({
     senha: yup.string().required().min(6).max(32),
 });
 
-router.post('/cadastrar', async (req, res) => {
+router.post('/cadastrar', asyncHandler(async(req, res) => {
         schema.isValid(req.body)
         .then(function (valid) {
             if(valid){
@@ -21,21 +22,17 @@ router.post('/cadastrar', async (req, res) => {
                 res.status(400).send('Dados incorretos!');
             }   
         });
-});
+}));
 
-router.get('/', function (req, res, next) {
-    return res.json('all users sent');
-});
-
-router.get('/listar', async (req, res) => {
+router.get('/listar', asyncHandler(async(req, res) => {
         await sequelize.authenticate();
 
         const usuarios = await Usuario.findAll({order: ['nome']});
 
         res.status(200).send(usuarios);
-});
+}));
 
-router.get('/deletar/:id', (req, res) => {
+router.get('/deletar/:id', asyncHandler(async(req, res) => {
     var id = parseInt(req.params.id);
 
     (async () => {
@@ -46,9 +43,9 @@ router.get('/deletar/:id', (req, res) => {
             res.status(200).send();
       })();
     
-});
+}));
 
-router.post('/editar', async (req, res) => {
+router.post('/editar', asyncHandler(async(req, res) => {
 
     schema.isValid(req.body).then(function (valid) {
         if(valid){
@@ -67,6 +64,6 @@ router.post('/editar', async (req, res) => {
         }
     });      
 
-});
+}));
 
 module.exports = app => app.use('/auth', router)

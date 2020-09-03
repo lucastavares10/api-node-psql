@@ -32,10 +32,10 @@ describe('GET /auth/listar', function() {
 });
 
 //param:id
-describe('DELETE /auth/deletar/11', function() {
+describe('DELETE /auth/deletar/1', function() {
     it('responds with json', async () => {
       request(app)
-        .get('/auth/deletar/11')
+        .get('/auth/deletar/1')
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
         .expect(200)
