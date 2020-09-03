@@ -12,23 +12,15 @@ const schema = yup.object().shape({
 });
 
 router.post('/cadastrar', async (req, res) => {
-    schema.isValid(req.body)
-    .then(function (valid) {
-        if(valid){
-            try {
+        schema.isValid(req.body)
+        .then(function (valid) {
+            if(valid){
                 const usuario = Usuario.create(req.body);
-
-                res.status(200).send();
-                            
-            } catch (error) {
-                res.status(500).send('Algum erro interno!');
-            }            
-        } else {
-            res.send(res.status(400).send('Dados incorretos!'));
-        }
-
-    });
-
+                res.status(200).send();         
+            } else {
+                res.status(400).send('Dados incorretos!');
+            }   
+        });
 });
 
 router.get('/', function (req, res, next) {
@@ -36,33 +28,22 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/listar', async (req, res) => {
+        await sequelize.authenticate();
 
-        try {
-            await sequelize.authenticate();
+        const usuarios = await Usuario.findAll({order: ['nome']});
 
-            const usuarios = await Usuario.findAll({order: ['nome']});
-
-            res.send(usuarios);
-        } catch (error) {
-            res.status(500).send('Algum erro interno!');
-        }
-
+        res.status(200).send(usuarios);
 });
 
 router.get('/deletar/:id', (req, res) => {
     var id = parseInt(req.params.id);
 
     (async () => {
-        try {
             await sequelize.authenticate();
 
             const usuario = await Usuario.destroy({ where: { id: req.params.id } });
             
             res.status(200).send();
-
-          } catch (error) {
-            res.status(500).send('Algum erro interno!');
-          }
       })();
     
 });
@@ -72,23 +53,17 @@ router.post('/editar', async (req, res) => {
     schema.isValid(req.body).then(function (valid) {
         if(valid){
             (async () => {
-                try {
-                    await sequelize.authenticate();
-                    const usuario = await Usuario.findOne({ where: { id: req.body.id } });
+                await sequelize.authenticate();
+                const usuario = await Usuario.findOne({ where: { id: req.body.id } });
 
-                    usuario.update({ nome: req.body.nome, 
-                        email: req.body.email, 
-                        senha: req.body.senha});
+                usuario.update({ nome: req.body.nome, 
+                    email: req.body.email, 
+                    senha: req.body.senha});
         
-                    res.status(200)
-        
-                  } catch (error) {
-                    console.error('Deu erro:', error);
-                  }
+                res.status(200)
               })();
-
         } else {
-            res.send(res.status(400).send('Dados incorretos!'));
+            res.status(400).send('Dados incorretos!');
         }
     });      
 
