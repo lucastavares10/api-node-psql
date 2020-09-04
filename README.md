@@ -1,4 +1,4 @@
-# api_node
+# api-node-psql
 API - CRUD de usuários
 
   Express
