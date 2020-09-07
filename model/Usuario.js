@@ -1,5 +1,6 @@
 const { Sequelize, Model, DataTypes } = require('sequelize');
 const sequelize = require('../database/db');
+const Perfil = require('./Perfil');
 
 const Usuario = sequelize.define('usuario', {
     nome: {
@@ -15,11 +16,15 @@ const Usuario = sequelize.define('usuario', {
         type: DataTypes.STRING,
         required:true,
         select: false,
-    }
+    },
 }, {
     timestamps: false
 });
 
-
+Perfil.hasOne(Usuario, {
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
+});
+Usuario.belongsTo(Perfil);
 
 module.exports = Usuario;

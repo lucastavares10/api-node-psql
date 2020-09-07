@@ -1,6 +1,7 @@
 const express = require('express');
 const yup = require('yup');
 const Usuario = require('../model/Usuario');
+const Perfil = require('../model/Perfil');
 const sequelize = require('../database/db');
 const asyncHandler = require('express-async-handler');
 
@@ -13,11 +14,20 @@ const schema = yup.object().shape({
 });
 
 router.post('/cadastrar', asyncHandler(async(req, res) => {
+
         schema.isValid(req.body)
         .then(function (valid) {
             if(valid){
-                const usuario = Usuario.create(req.body);
-                res.status(200).send();         
+                (async () => {
+                    await Usuario.sync({ force: false });
+                    const usuario = Usuario.create({
+                        nome: req.body.nome,
+                        email: req.body.email,
+                        senha: req.body.senha,
+                        perfilId: req.body.perfilId
+                      });
+                    res.status(200).send();  
+                })();
             } else {
                 res.status(400).send('Dados incorretos!');
             }   
@@ -26,9 +36,8 @@ router.post('/cadastrar', asyncHandler(async(req, res) => {
 
 router.get('/listar', asyncHandler(async(req, res) => {
         await sequelize.authenticate();
-
-        const usuarios = await Usuario.findAll({order: ['nome']});
-
+        const usuarios = await Usuario.findAll({order: ['nome'], include: 'perfil'});
+        console.log(usuarios)
         res.status(200).send(usuarios);
 }));
 
@@ -66,4 +75,4 @@ router.post('/editar', asyncHandler(async(req, res) => {
 
 }));
 
-module.exports = app => app.use('/auth', router)
+module.exports = app => app.use('/usuario', router)
